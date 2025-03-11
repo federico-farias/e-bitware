@@ -1,9 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.UserRepository;
-import com.example.demo.dto.CreateUserDTO;
 import com.example.demo.dto.SearchUsersDTO;
 import com.example.demo.dto.UserDTO;
+import com.example.demo.dto.UserRequestDTO;
 import com.example.demo.exception.UserNotFound;
 import com.example.demo.model.Usuario;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public String create(CreateUserDTO request) {
+    public String create(UserRequestDTO request) {
         var id = UUID.randomUUID().toString();
         Usuario usuario = new Usuario();
         usuario.setId(id);
@@ -56,5 +56,22 @@ public class UserServiceImpl implements UserService {
                 user.getUpdatedAt()
         );
     }
+
+    @Override
+    public UserDTO update(String id, UserRequestDTO request) {
+        var user = this.userRepository.findById(id).orElseThrow(() -> new UserNotFound("usuario no encontrado"));
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setUpdatedAt(new Date());
+        this.userRepository.save(user);
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+    }
+
 
 }

@@ -1,8 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.CreateUserDTO;
 import com.example.demo.dto.SearchUsersDTO;
 import com.example.demo.dto.UserDTO;
+import com.example.demo.dto.UserRequestDTO;
 import com.example.demo.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateUserDTO request) {
+    public ResponseEntity<?> create(@RequestBody UserRequestDTO request) {
         var id = this.userService.create(request);
         return ResponseEntity.created(URI.create(String.format("/%s", id))).build();
     }
@@ -34,6 +34,11 @@ public class UserController {
     public ResponseEntity<UserDTO> findById(@PathVariable("id") String id) {
         var result = this.userService.findById(id);
         return ResponseEntity.ok(result);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserDTO> update(@PathVariable("id") String id, @RequestBody UserRequestDTO request) {
+        return ResponseEntity.ok(this.userService.update(id, request));
     }
 
 }
