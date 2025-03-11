@@ -20,6 +20,9 @@ public class Usuario {
     private String email;
 
     @Column
+    private Boolean active;
+
+    @Column
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date createdAt;
 

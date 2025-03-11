@@ -27,13 +27,14 @@ public class UserServiceImpl implements UserService {
         usuario.setEmail(request.getEmail());
         usuario.setCreatedAt(new Date());
         usuario.setUpdatedAt(new Date());
+        usuario.setActive(true);
         this.userRepository.save(usuario);
         return id;
     }
 
     @Override
     public SearchUsersDTO findAll() {
-        var list = this.userRepository.findAll().stream().map(
+        var list = this.userRepository.findAllActive().stream().map(
                 u -> new UserDTO(
                         u.getId(),
                         u.getName(),
@@ -47,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO findById(String id) {
-        var user = this.userRepository.findById(id).orElseThrow(() -> new UserNotFound("usuario no encontrado"));
+        var user = this.userRepository.findByIdAndActive(id).orElseThrow(() -> new UserNotFound("usuario no encontrado"));
         return new UserDTO(
                 user.getId(),
                 user.getName(),
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO update(String id, UserRequestDTO request) {
-        var user = this.userRepository.findById(id).orElseThrow(() -> new UserNotFound("usuario no encontrado"));
+        var user = this.userRepository.findByIdAndActive(id).orElseThrow(() -> new UserNotFound("usuario no encontrado"));
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setUpdatedAt(new Date());
@@ -71,6 +72,13 @@ public class UserServiceImpl implements UserService {
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
+    }
+
+    @Override
+    public void delete(String id) {
+        var user = this.userRepository.findByIdAndActive(id).orElseThrow(() -> new UserNotFound("usuario no encontrado"));
+        user.setActive(false);
+        this.userRepository.save(user);
     }
 
 
