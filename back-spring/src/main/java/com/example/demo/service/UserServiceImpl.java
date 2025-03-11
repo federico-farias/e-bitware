@@ -4,12 +4,11 @@ import com.example.demo.UserRepository;
 import com.example.demo.dto.CreateUserDTO;
 import com.example.demo.dto.SearchUsersDTO;
 import com.example.demo.dto.UserDTO;
+import com.example.demo.exception.UserNotFound;
 import com.example.demo.model.Usuario;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
@@ -20,14 +19,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public void create(CreateUserDTO request) {
+    public String create(CreateUserDTO request) {
+        var id = UUID.randomUUID().toString();
         Usuario usuario = new Usuario();
-        usuario.setId(UUID.randomUUID().toString());
+        usuario.setId(id);
         usuario.setName(request.getName());
         usuario.setEmail(request.getEmail());
         usuario.setCreatedAt(new Date());
         usuario.setUpdatedAt(new Date());
         this.userRepository.save(usuario);
+        return id;
     }
 
     @Override
@@ -42,6 +43,18 @@ public class UserServiceImpl implements UserService {
                 )
         ).toList();
         return new SearchUsersDTO(list);
+    }
+
+    @Override
+    public UserDTO findById(String id) {
+        var user = this.userRepository.findById(id).orElseThrow(() -> new UserNotFound("usuario no encontrado"));
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
     }
 
 }
