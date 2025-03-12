@@ -28,3 +28,5 @@ replay_pid*
 back-spring/.idea/
 
 back-spring/target/
+
+back-nodejs/node_modules/
